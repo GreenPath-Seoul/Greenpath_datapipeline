@@ -14,7 +14,7 @@ import pandas as pd
 import requests
 
 
-CSV_PATH = "data/PlaceDb.csv"
+CSV_PATH = "data-pipeline/data/PlaceDb.csv"
 GOOGLE_TEXT_SEARCH_URL = "https://places.googleapis.com/v1/places:searchText"
 GOOGLE_PHOTO_BASE_URL = "https://places.googleapis.com/v1"
 DEFAULT_IMAGE_WIDTH = 600
@@ -127,7 +127,6 @@ def upload_bytes_to_s3(
     image_bytes: bytes,
     content_type: str,
     object_key: str,
-    acl_public_read: bool = False,
     custom_domain: Optional[str] = None,
 ) -> str:
     fileobj = io.BytesIO(image_bytes)
@@ -135,9 +134,7 @@ def upload_bytes_to_s3(
     extra_args = {
         "ContentType": content_type,
     }
-    if acl_public_read:
-        extra_args["ACL"] = "public-read"
-
+    
     s3_client.upload_fileobj(
         Fileobj=fileobj,
         Bucket=bucket,
@@ -254,7 +251,6 @@ def update_images_by_codes(codes: list[str], csv_path: str = CSV_PATH) -> None:
                 image_bytes=image_bytes,
                 content_type=content_type,
                 object_key=object_key,
-                acl_public_read=acl_public_read,
                 custom_domain=s3_custom_domain,
             )
 
